@@ -3,13 +3,16 @@
 
 using namespace std;
 
-void addBook(
-    int bookIds[],
-    string bookTitles[],
-    string authors[],
-    double prices[],
-    bool availabilities[],
-    int &bookCount)
+struct Book
+{
+    int id;
+    string title;
+    string author;
+    double price;
+    bool available;
+};
+
+void addBook(Book books[], int &bookCount)
 {
     if (bookCount >= 100)
     {
@@ -22,37 +25,37 @@ void addBook(
     cout << "========================================\n\n";
 
     cout << "Enter the Book's ID: ";
-    cin >> bookIds[bookCount];
+    cin >> books[bookCount].id;
 
     cin.ignore();
 
     cout << "Enter the Book's Title: ";
-    getline(cin, bookTitles[bookCount]);
+    getline(cin, books[bookCount].title);
 
     cout << "Enter the Book's Author: ";
-    getline(cin, authors[bookCount]);
+    getline(cin, books[bookCount].author);
 
     cout << "Enter the Book's Price: ";
-    cin >> prices[bookCount];
+    cin >> books[bookCount].price;
 
     cout << "Is the book available? (1 = Yes, 0 = No): ";
-    cin >> availabilities[bookCount];
+    cin >> books[bookCount].available;
 
     cout << "\nBook added successfully! :)\n";
 
-    double discount = prices[bookCount] * 0.10;
-    double finalPrice = prices[bookCount] - discount;
+    double discount = books[bookCount].price * 0.10;
+    double finalPrice = books[bookCount].price - discount;
 
     cout << "\n========================================\n";
     cout << "          BOOK INFORMATION              \n";
     cout << "========================================\n\n";
 
-    cout << "Book ID: " << bookIds[bookCount] << '\n';
-    cout << "Title: " << bookTitles[bookCount] << '\n';
-    cout << "Author: " << authors[bookCount] << '\n';
-    cout << "Price: " << prices[bookCount] << '\n';
+    cout << "Book ID: " << books[bookCount].id << '\n';
+    cout << "Title: " << books[bookCount].title << '\n';
+    cout << "Author: " << books[bookCount].author << '\n';
+    cout << "Price: " << books[bookCount].price << '\n';
 
-    if (availabilities[bookCount])
+    if (books[bookCount].available)
     {
         cout << "Available: Yes :)\n";
     }
@@ -65,7 +68,7 @@ void addBook(
     cout << "             PRICE DETAILS              \n";
     cout << "========================================\n\n";
 
-    cout << "Original Price: " << prices[bookCount] << '\n';
+    cout << "Original Price: " << books[bookCount].price << '\n';
     cout << "Discount: " << discount << '\n';
     cout << "Final Price: " << finalPrice << '\n';
 
@@ -73,11 +76,11 @@ void addBook(
     cout << "             BOOK CATEGORY              \n";
     cout << "========================================\n\n";
 
-    if (prices[bookCount] < 300)
+    if (books[bookCount].price < 300)
     {
         cout << "Category: Budget :)\n";
     }
-    else if (prices[bookCount] <= 700)
+    else if (books[bookCount].price <= 700)
     {
         cout << "Category: Standard :)\n";
     }
@@ -89,13 +92,7 @@ void addBook(
     bookCount++;
 }
 
-void displayBooks(
-    int bookIds[],
-    string bookTitles[],
-    string authors[],
-    double prices[],
-    bool availabilities[],
-    int bookCount)
+void displayBooks(Book books[], int bookCount)
 {
     cout << "\n========================================\n";
     cout << "             ALL BOOKS                  \n";
@@ -115,12 +112,12 @@ void displayBooks(
         cout << "Book " << i + 1 << '\n';
         cout << "----------------------------------------\n";
 
-        cout << "Book ID: " << bookIds[i] << '\n';
-        cout << "Title: " << bookTitles[i] << '\n';
-        cout << "Author: " << authors[i] << '\n';
-        cout << "Price: " << prices[i] << '\n';
+        cout << "Book ID: " << books[i].id << '\n';
+        cout << "Title: " << books[i].title << '\n';
+        cout << "Author: " << books[i].author << '\n';
+        cout << "Price: " << books[i].price << '\n';
 
-        if (availabilities[i])
+        if (books[i].available)
         {
             cout << "Availability: Available :)\n";
         }
@@ -131,13 +128,7 @@ void displayBooks(
     }
 }
 
-void searchBook(
-    int bookIds[],
-    string bookTitles[],
-    string authors[],
-    double prices[],
-    bool availabilities[],
-    int bookCount)
+void searchBook(Book books[], int bookCount)
 {
     cout << "\n========================================\n";
     cout << "              SEARCH BOOK               \n";
@@ -158,16 +149,16 @@ void searchBook(
 
     for (int i = 0; i < bookCount; i++)
     {
-        if (bookIds[i] == searchId)
+        if (books[i].id == searchId)
         {
             cout << "\nBook found! :)\n\n";
 
-            cout << "Book ID: " << bookIds[i] << '\n';
-            cout << "Title: " << bookTitles[i] << '\n';
-            cout << "Author: " << authors[i] << '\n';
-            cout << "Price: " << prices[i] << '\n';
+            cout << "Book ID: " << books[i].id << '\n';
+            cout << "Title: " << books[i].title << '\n';
+            cout << "Author: " << books[i].author << '\n';
+            cout << "Price: " << books[i].price << '\n';
 
-            if (availabilities[i])
+            if (books[i].available)
             {
                 cout << "Availability: Available :)\n";
             }
@@ -187,11 +178,7 @@ void searchBook(
     }
 }
 
-void issueBook(
-    int bookIds[],
-    string bookTitles[],
-    bool availabilities[],
-    int bookCount)
+void issueBook(Book books[], int bookCount)
 {
     cout << "\n========================================\n";
     cout << "               ISSUE BOOK               \n";
@@ -212,16 +199,16 @@ void issueBook(
 
     for (int i = 0; i < bookCount; i++)
     {
-        if (bookIds[i] == issueId)
+        if (books[i].id == issueId)
         {
             found = true;
 
-            if (availabilities[i])
+            if (books[i].available)
             {
-                availabilities[i] = false;
+                books[i].available = false;
 
                 cout << "\nBook issued successfully! :)\n";
-                cout << "Book: " << bookTitles[i] << '\n';
+                cout << "Book: " << books[i].title << '\n';
             }
             else
             {
@@ -238,11 +225,7 @@ void issueBook(
     }
 }
 
-void returnBook(
-    int bookIds[],
-    string bookTitles[],
-    bool availabilities[],
-    int bookCount)
+void returnBook(Book books[], int bookCount)
 {
     cout << "\n========================================\n";
     cout << "              RETURN BOOK               \n";
@@ -263,16 +246,16 @@ void returnBook(
 
     for (int i = 0; i < bookCount; i++)
     {
-        if (bookIds[i] == returnId)
+        if (books[i].id == returnId)
         {
             found = true;
 
-            if (!availabilities[i])
+            if (!books[i].available)
             {
-                availabilities[i] = true;
+                books[i].available = true;
 
                 cout << "\nBook returned successfully! :)\n";
-                cout << "Book: " << bookTitles[i] << '\n';
+                cout << "Book: " << books[i].title << '\n';
             }
             else
             {
@@ -297,14 +280,9 @@ int main()
 
     const int MAX_BOOKS = 100;
 
-    int bookIds[MAX_BOOKS];
-    string bookTitles[MAX_BOOKS];
-    string authors[MAX_BOOKS];
-    double prices[MAX_BOOKS];
-    bool availabilities[MAX_BOOKS];
+    Book books[MAX_BOOKS];
 
     int bookCount = 0;
-
     int choice;
 
     do
@@ -326,49 +304,23 @@ int main()
         switch (choice)
         {
         case 1:
-            addBook(
-                bookIds,
-                bookTitles,
-                authors,
-                prices,
-                availabilities,
-                bookCount);
+            addBook(books, bookCount);
             break;
 
         case 2:
-            displayBooks(
-                bookIds,
-                bookTitles,
-                authors,
-                prices,
-                availabilities,
-                bookCount);
+            displayBooks(books, bookCount);
             break;
 
         case 3:
-            searchBook(
-                bookIds,
-                bookTitles,
-                authors,
-                prices,
-                availabilities,
-                bookCount);
+            searchBook(books, bookCount);
             break;
 
         case 4:
-            issueBook(
-                bookIds,
-                bookTitles,
-                availabilities,
-                bookCount);
+            issueBook(books, bookCount);
             break;
 
         case 5:
-            returnBook(
-                bookIds,
-                bookTitles,
-                availabilities,
-                bookCount);
+            returnBook(books, bookCount);
             break;
 
         case 6:
