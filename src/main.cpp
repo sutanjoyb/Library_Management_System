@@ -56,7 +56,7 @@ void addBook(Book books[], int &bookCount)
 
     books[position].id = newBookId;
 
-    cin.ignore();
+    cin.ignore(1000, '\n');
 
     cout << "Enter the Book's Title: ";
     getline(cin, books[position].title);
@@ -67,8 +67,7 @@ void addBook(Book books[], int &bookCount)
     cout << "Enter the Book's Price: ";
     cin >> books[position].price;
 
-    cout << "Is the book available? (1 = Yes, 0 = No): ";
-    cin >> books[position].available;
+    books[position].available = true;
 
     cout << "\nBook added successfully! :)\n";
 
@@ -83,15 +82,7 @@ void addBook(Book books[], int &bookCount)
     cout << "Title: " << books[position].title << '\n';
     cout << "Author: " << books[position].author << '\n';
     cout << "Price: " << books[position].price << '\n';
-
-    if (books[position].available)
-    {
-        cout << "Available: Yes :)\n";
-    }
-    else
-    {
-        cout << "Available: No :(\n";
-    }
+    cout << "Available: Yes :)\n";
 
     cout << "\n========================================\n";
     cout << "             PRICE DETAILS              \n";
@@ -382,7 +373,7 @@ int main()
         {
             cout << "\nPress Enter to return to the main menu...";
 
-            cin.ignore();
+            cin.ignore(1000, '\n');
             cin.get();
 
             cout << "\n";
