@@ -24,38 +24,67 @@ void addBook(Book books[], int &bookCount)
     cout << "               ADD BOOK                 \n";
     cout << "========================================\n\n";
 
+    int newBookId;
+
     cout << "Enter the Book's ID: ";
-    cin >> books[bookCount].id;
+    cin >> newBookId;
+
+    for (int i = 0; i < bookCount; i++)
+    {
+        if (books[i].id == newBookId)
+        {
+            cout << "\nBook ID already exists. Please use a different ID. :(\n";
+            return;
+        }
+    }
+
+    int position = bookCount;
+
+    for (int i = 0; i < bookCount; i++)
+    {
+        if (newBookId < books[i].id)
+        {
+            position = i;
+            break;
+        }
+    }
+
+    for (int i = bookCount; i > position; i--)
+    {
+        books[i] = books[i - 1];
+    }
+
+    books[position].id = newBookId;
 
     cin.ignore();
 
     cout << "Enter the Book's Title: ";
-    getline(cin, books[bookCount].title);
+    getline(cin, books[position].title);
 
     cout << "Enter the Book's Author: ";
-    getline(cin, books[bookCount].author);
+    getline(cin, books[position].author);
 
     cout << "Enter the Book's Price: ";
-    cin >> books[bookCount].price;
+    cin >> books[position].price;
 
     cout << "Is the book available? (1 = Yes, 0 = No): ";
-    cin >> books[bookCount].available;
+    cin >> books[position].available;
 
     cout << "\nBook added successfully! :)\n";
 
-    double discount = books[bookCount].price * 0.10;
-    double finalPrice = books[bookCount].price - discount;
+    double discount = books[position].price * 0.10;
+    double finalPrice = books[position].price - discount;
 
     cout << "\n========================================\n";
     cout << "          BOOK INFORMATION              \n";
     cout << "========================================\n\n";
 
-    cout << "Book ID: " << books[bookCount].id << '\n';
-    cout << "Title: " << books[bookCount].title << '\n';
-    cout << "Author: " << books[bookCount].author << '\n';
-    cout << "Price: " << books[bookCount].price << '\n';
+    cout << "Book ID: " << books[position].id << '\n';
+    cout << "Title: " << books[position].title << '\n';
+    cout << "Author: " << books[position].author << '\n';
+    cout << "Price: " << books[position].price << '\n';
 
-    if (books[bookCount].available)
+    if (books[position].available)
     {
         cout << "Available: Yes :)\n";
     }
@@ -68,7 +97,7 @@ void addBook(Book books[], int &bookCount)
     cout << "             PRICE DETAILS              \n";
     cout << "========================================\n\n";
 
-    cout << "Original Price: " << books[bookCount].price << '\n';
+    cout << "Original Price: " << books[position].price << '\n';
     cout << "Discount: " << discount << '\n';
     cout << "Final Price: " << finalPrice << '\n';
 
@@ -76,11 +105,11 @@ void addBook(Book books[], int &bookCount)
     cout << "             BOOK CATEGORY              \n";
     cout << "========================================\n\n";
 
-    if (books[bookCount].price < 300)
+    if (books[position].price < 300)
     {
         cout << "Category: Budget :)\n";
     }
-    else if (books[bookCount].price <= 700)
+    else if (books[position].price <= 700)
     {
         cout << "Category: Standard :)\n";
     }
@@ -145,34 +174,48 @@ void searchBook(Book books[], int bookCount)
     cout << "Enter the Book ID to search: ";
     cin >> searchId;
 
-    bool found = false;
+    int left = 0;
+    int right = bookCount - 1;
+    int foundIndex = -1;
 
-    for (int i = 0; i < bookCount; i++)
+    while (left <= right)
     {
-        if (books[i].id == searchId)
+        int middle = left + (right - left) / 2;
+
+        if (books[middle].id == searchId)
         {
-            cout << "\nBook found! :)\n\n";
-
-            cout << "Book ID: " << books[i].id << '\n';
-            cout << "Title: " << books[i].title << '\n';
-            cout << "Author: " << books[i].author << '\n';
-            cout << "Price: " << books[i].price << '\n';
-
-            if (books[i].available)
-            {
-                cout << "Availability: Available :)\n";
-            }
-            else
-            {
-                cout << "Availability: Issued :(\n";
-            }
-
-            found = true;
+            foundIndex = middle;
             break;
+        }
+        else if (searchId < books[middle].id)
+        {
+            right = middle - 1;
+        }
+        else
+        {
+            left = middle + 1;
         }
     }
 
-    if (!found)
+    if (foundIndex != -1)
+    {
+        cout << "\nBook found! :)\n\n";
+
+        cout << "Book ID: " << books[foundIndex].id << '\n';
+        cout << "Title: " << books[foundIndex].title << '\n';
+        cout << "Author: " << books[foundIndex].author << '\n';
+        cout << "Price: " << books[foundIndex].price << '\n';
+
+        if (books[foundIndex].available)
+        {
+            cout << "Availability: Available :)\n";
+        }
+        else
+        {
+            cout << "Availability: Issued :(\n";
+        }
+    }
+    else
     {
         cout << "\nBook not found. :(\n";
     }
