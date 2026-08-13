@@ -12,6 +12,22 @@ struct Book
     bool available;
 };
 
+void clearInput()
+{
+    if (cin.fail())
+    {
+        cin.clear();
+    }
+    cin.ignore(10000, '\n');
+}
+
+void pauseProgram()
+{
+    cout << "\nPress Enter to return to the main menu...";
+    clearInput();
+    cout << "\n";
+}
+
 void addBook(Book books[], int &bookCount)
 {
     if (bookCount >= 100)
@@ -27,7 +43,12 @@ void addBook(Book books[], int &bookCount)
     int newBookId;
 
     cout << "Enter the Book's ID: ";
-    cin >> newBookId;
+    if (!(cin >> newBookId))
+    {
+        cout << "\nInvalid ID entered. Returning to menu.\n";
+        clearInput();
+        return;
+    }
 
     for (int i = 0; i < bookCount; i++)
     {
@@ -56,7 +77,7 @@ void addBook(Book books[], int &bookCount)
 
     books[position].id = newBookId;
 
-    cin.ignore(1000, '\n');
+    clearInput();
 
     cout << "Enter the Book's Title: ";
     getline(cin, books[position].title);
@@ -65,11 +86,14 @@ void addBook(Book books[], int &bookCount)
     getline(cin, books[position].author);
 
     cout << "Enter the Book's Price: ";
-    cin >> books[position].price;
+    while (!(cin >> books[position].price) || books[position].price < 0)
+    {
+        cout << "Invalid price. Please enter a valid non-negative number: ";
+        cin.clear();
+        cin.ignore(10000, '\n');
+    }
 
     books[position].available = true;
-
-    cout << "\nBook added successfully! :)\n";
 
     double discount = books[position].price * 0.10;
     double finalPrice = books[position].price - discount;
@@ -110,6 +134,13 @@ void addBook(Book books[], int &bookCount)
     }
 
     bookCount++;
+
+    cout << "\n========================================\n";
+    cout << "            BOOK ADDED :)               \n";
+    cout << "========================================\n";
+
+    cout << "Book \"" << books[position].title
+         << "\" has been added successfully!\n";
 }
 
 void displayBooks(Book books[], int bookCount)
@@ -163,7 +194,11 @@ void searchBook(Book books[], int bookCount)
     int searchId;
 
     cout << "Enter the Book ID to search: ";
-    cin >> searchId;
+    if (!(cin >> searchId))
+    {
+        cout << "\nInvalid input.\n";
+        return;
+    }
 
     int left = 0;
     int right = bookCount - 1;
@@ -227,7 +262,11 @@ void issueBook(Book books[], int bookCount)
     int issueId;
 
     cout << "Enter the Book ID to issue: ";
-    cin >> issueId;
+    if (!(cin >> issueId))
+    {
+        cout << "\nInvalid input.\n";
+        return;
+    }
 
     bool found = false;
 
@@ -274,7 +313,11 @@ void returnBook(Book books[], int bookCount)
     int returnId;
 
     cout << "Enter the Book ID to return: ";
-    cin >> returnId;
+    if (!(cin >> returnId))
+    {
+        cout << "\nInvalid input.\n";
+        return;
+    }
 
     bool found = false;
 
@@ -309,7 +352,7 @@ void returnBook(Book books[], int bookCount)
 int main()
 {
     cout << "========================================\n";
-    cout << "       LIBRARY MANAGEMENT SYSTEM        \n";
+    cout << "        LIBRARY MANAGEMENT SYSTEM        \n";
     cout << "========================================\n\n";
 
     const int MAX_BOOKS = 100;
@@ -333,28 +376,39 @@ int main()
         cout << "6. Exit\n";
 
         cout << "\nEnter your choice: ";
-        cin >> choice;
+        if (!(cin >> choice))
+        {
+            cout << "\nInvalid choice. Please enter a number between 1 and 6. :(\n";
+            cin.clear();
+            cin.ignore(10000, '\n');
+            continue;
+        }
 
         switch (choice)
         {
         case 1:
             addBook(books, bookCount);
+            pauseProgram();
             break;
 
         case 2:
             displayBooks(books, bookCount);
+            pauseProgram();
             break;
 
         case 3:
             searchBook(books, bookCount);
+            pauseProgram();
             break;
 
         case 4:
             issueBook(books, bookCount);
+            pauseProgram();
             break;
 
         case 5:
             returnBook(books, bookCount);
+            pauseProgram();
             break;
 
         case 6:
@@ -367,16 +421,7 @@ int main()
 
         default:
             cout << "\nInvalid choice. Please enter a number between 1 and 6. :(\n";
-        }
-
-        if (choice != 6)
-        {
-            cout << "\nPress Enter to return to the main menu...";
-
-            cin.ignore(1000, '\n');
-            cin.get();
-
-            cout << "\n";
+            pauseProgram();
         }
 
     } while (choice != 6);
