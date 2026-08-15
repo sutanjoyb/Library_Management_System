@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -19,6 +20,9 @@ struct Book
     BookStatus status;
 };
 
+void saveBooks(Book books[], int bookCount);
+void loadBooks(Book books[], int &bookCount);
+
 void clearInput()
 {
     if (cin.fail())
@@ -33,7 +37,70 @@ void pauseProgram()
 {
     cout << "\nPress Enter to return to the main menu...";
     clearInput();
+    cin.get();
     cout << "\n";
+}
+
+void saveBooks(Book books[], int bookCount)
+{
+    ofstream file("books.txt");
+
+    if (!file)
+    {
+        cout << "\nUnable to save library data. :(\n";
+        return;
+    }
+
+    for (int i = 0; i < bookCount; i++)
+    {
+        file << books[i].id << '\n';
+        file << books[i].title << '\n';
+        file << books[i].author << '\n';
+        file << books[i].price << '\n';
+        file << books[i].status << '\n';
+    }
+
+    file.close();
+}
+
+void loadBooks(Book books[], int &bookCount)
+{
+    ifstream file("books.txt");
+
+    if (!file)
+    {
+        cout << "\nNo saved library data found. Starting with an empty library. :)\n";
+        return;
+    }
+
+    bookCount = 0;
+
+    while (bookCount < 100 &&
+           file >> books[bookCount].id)
+    {
+        file.ignore();
+
+        getline(file, books[bookCount].title);
+        getline(file, books[bookCount].author);
+
+        file >> books[bookCount].price;
+
+        int status;
+
+        file >> status;
+
+        books[bookCount].status =
+            static_cast<BookStatus>(status);
+
+        file.ignore();
+
+        bookCount++;
+    }
+
+    file.close();
+
+    cout << "\nLibrary data loaded successfully! :)\n";
+    cout << "Total books loaded: " << bookCount << '\n';
 }
 
 void addBook(Book books[], int &bookCount)
@@ -96,7 +163,8 @@ void addBook(Book books[], int &bookCount)
 
     cout << "Enter the Book's Price: ";
 
-    while (!(cin >> books[position].price) || books[position].price < 0)
+    while (!(cin >> books[position].price) ||
+           books[position].price < 0)
     {
         cout << "Invalid price. Please enter a valid non-negative number: ";
         cin.clear();
@@ -156,6 +224,8 @@ void addBook(Book books[], int &bookCount)
     }
 
     bookCount++;
+
+    saveBooks(books, bookCount);
 
     cout << "\n========================================\n";
     cout << "            BOOK ADDED :)               \n";
@@ -335,6 +405,8 @@ void issueBook(Book books[], int bookCount)
     {
         books[foundIndex].status = ISSUED;
 
+        saveBooks(books, bookCount);
+
         cout << "\nBook issued successfully! :)\n";
         cout << "Book: " << books[foundIndex].title << '\n';
     }
@@ -403,6 +475,8 @@ void returnBook(Book books[], int bookCount)
     if (books[foundIndex].status == ISSUED)
     {
         books[foundIndex].status = AVAILABLE;
+
+        saveBooks(books, bookCount);
 
         cout << "\nBook returned successfully! :)\n";
         cout << "Book: " << books[foundIndex].title << '\n';
@@ -479,6 +553,8 @@ void deleteBook(Book books[], int &bookCount)
 
     bookCount--;
 
+    saveBooks(books, bookCount);
+
     cout << "\nBook deleted successfully! :)\n";
 }
 
@@ -494,6 +570,8 @@ int main()
 
     int bookCount = 0;
     int choice;
+
+    loadBooks(books, bookCount);
 
     do
     {
