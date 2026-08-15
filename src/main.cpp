@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <cmath>
 
 using namespace std;
 
@@ -174,7 +175,8 @@ void addBook(Book books[], int &bookCount)
     books[position].status = AVAILABLE;
 
     double discount = books[position].price * 0.10;
-    double finalPrice = books[position].price - discount;
+    int finalPrice = static_cast<int>(
+        round(books[position].price - discount));
 
     cout << "\n========================================\n";
     cout << "          BOOK INFORMATION              \n";
@@ -407,8 +409,25 @@ void issueBook(Book books[], int bookCount)
 
         saveBooks(books, bookCount);
 
-        cout << "\nBook issued successfully! :)\n";
+        double discount = books[foundIndex].price * 0.10;
+
+        int finalPrice = static_cast<int>(
+            round(books[foundIndex].price - discount));
+
+        cout << "\n========================================\n";
+        cout << "        BOOK ISSUED SUCCESSFULLY       \n";
+        cout << "========================================\n\n";
+
         cout << "Book: " << books[foundIndex].title << '\n';
+        cout << "Author: " << books[foundIndex].author << '\n';
+
+        cout << "\n========================================\n";
+        cout << "             PRICE DETAILS              \n";
+        cout << "========================================\n\n";
+
+        cout << "Original Price: " << books[foundIndex].price << '\n';
+        cout << "Discount: " << discount << '\n';
+        cout << "Final Price: " << finalPrice << '\n';
     }
     else if (books[foundIndex].status == ISSUED)
     {
