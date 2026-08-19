@@ -1,7 +1,5 @@
 #include <iostream>
 #include <string>
-#include <fstream>
-#include <cmath>
 
 using namespace std;
 
@@ -21,8 +19,12 @@ struct Book
     BookStatus status;
 };
 
-void saveBooks(Book books[], int bookCount);
-void loadBooks(Book books[], int &bookCount);
+struct User
+{
+    int id;
+    string name;
+    string email;
+};
 
 void clearInput()
 {
@@ -38,70 +40,7 @@ void pauseProgram()
 {
     cout << "\nPress Enter to return to the main menu...";
     clearInput();
-    cin.get();
     cout << "\n";
-}
-
-void saveBooks(Book books[], int bookCount)
-{
-    ofstream file("books.txt");
-
-    if (!file)
-    {
-        cout << "\nUnable to save library data. :(\n";
-        return;
-    }
-
-    for (int i = 0; i < bookCount; i++)
-    {
-        file << books[i].id << '\n';
-        file << books[i].title << '\n';
-        file << books[i].author << '\n';
-        file << books[i].price << '\n';
-        file << books[i].status << '\n';
-    }
-
-    file.close();
-}
-
-void loadBooks(Book books[], int &bookCount)
-{
-    ifstream file("books.txt");
-
-    if (!file)
-    {
-        cout << "\nNo saved library data found. Starting with an empty library. :)\n";
-        return;
-    }
-
-    bookCount = 0;
-
-    while (bookCount < 100 &&
-           file >> books[bookCount].id)
-    {
-        file.ignore();
-
-        getline(file, books[bookCount].title);
-        getline(file, books[bookCount].author);
-
-        file >> books[bookCount].price;
-
-        int status;
-
-        file >> status;
-
-        books[bookCount].status =
-            static_cast<BookStatus>(status);
-
-        file.ignore();
-
-        bookCount++;
-    }
-
-    file.close();
-
-    cout << "\nLibrary data loaded successfully! :)\n";
-    cout << "Total books loaded: " << bookCount << '\n';
 }
 
 void addBook(Book books[], int &bookCount)
@@ -164,8 +103,7 @@ void addBook(Book books[], int &bookCount)
 
     cout << "Enter the Book's Price: ";
 
-    while (!(cin >> books[position].price) ||
-           books[position].price < 0)
+    while (!(cin >> books[position].price) || books[position].price < 0)
     {
         cout << "Invalid price. Please enter a valid non-negative number: ";
         cin.clear();
@@ -175,8 +113,7 @@ void addBook(Book books[], int &bookCount)
     books[position].status = AVAILABLE;
 
     double discount = books[position].price * 0.10;
-    int finalPrice = static_cast<int>(
-        round(books[position].price - discount));
+    double finalPrice = books[position].price - discount;
 
     cout << "\n========================================\n";
     cout << "          BOOK INFORMATION              \n";
@@ -226,8 +163,6 @@ void addBook(Book books[], int &bookCount)
     }
 
     bookCount++;
-
-    saveBooks(books, bookCount);
 
     cout << "\n========================================\n";
     cout << "            BOOK ADDED :)               \n";
@@ -407,27 +342,8 @@ void issueBook(Book books[], int bookCount)
     {
         books[foundIndex].status = ISSUED;
 
-        saveBooks(books, bookCount);
-
-        double discount = books[foundIndex].price * 0.10;
-
-        int finalPrice = static_cast<int>(
-            round(books[foundIndex].price - discount));
-
-        cout << "\n========================================\n";
-        cout << "        BOOK ISSUED SUCCESSFULLY       \n";
-        cout << "========================================\n\n";
-
+        cout << "\nBook issued successfully! :)\n";
         cout << "Book: " << books[foundIndex].title << '\n';
-        cout << "Author: " << books[foundIndex].author << '\n';
-
-        cout << "\n========================================\n";
-        cout << "             PRICE DETAILS              \n";
-        cout << "========================================\n\n";
-
-        cout << "Original Price: " << books[foundIndex].price << '\n';
-        cout << "Discount: " << discount << '\n';
-        cout << "Final Price: " << finalPrice << '\n';
     }
     else if (books[foundIndex].status == ISSUED)
     {
@@ -494,8 +410,6 @@ void returnBook(Book books[], int bookCount)
     if (books[foundIndex].status == ISSUED)
     {
         books[foundIndex].status = AVAILABLE;
-
-        saveBooks(books, bookCount);
 
         cout << "\nBook returned successfully! :)\n";
         cout << "Book: " << books[foundIndex].title << '\n';
@@ -572,9 +486,75 @@ void deleteBook(Book books[], int &bookCount)
 
     bookCount--;
 
-    saveBooks(books, bookCount);
-
     cout << "\nBook deleted successfully! :)\n";
+}
+
+void addUser(User users[], int &userCount)
+{
+    if (userCount >= 100)
+    {
+        cout << "\nUser limit reached. Cannot register more users. :(\n";
+        return;
+    }
+
+    cout << "\n========================================\n";
+    cout << "              ADD USER                  \n";
+    cout << "========================================\n\n";
+
+    int newUserId;
+
+    cout << "Enter the User ID: ";
+
+    if (!(cin >> newUserId))
+    {
+        cout << "\nInvalid User ID entered. Returning to menu. :(\n";
+        clearInput();
+        return;
+    }
+
+    for (int i = 0; i < userCount; i++)
+    {
+        if (users[i].id == newUserId)
+        {
+            cout << "\nUser ID already exists. Please use a different ID. :(\n";
+            return;
+        }
+    }
+
+    int position = userCount;
+
+    for (int i = 0; i < userCount; i++)
+    {
+        if (newUserId < users[i].id)
+        {
+            position = i;
+            break;
+        }
+    }
+
+    for (int i = userCount; i > position; i--)
+    {
+        users[i] = users[i - 1];
+    }
+
+    users[position].id = newUserId;
+
+    clearInput();
+
+    cout << "Enter the User's Name: ";
+    getline(cin, users[position].name);
+
+    cout << "Enter the User's Email: ";
+    getline(cin, users[position].email);
+
+    userCount++;
+
+    cout << "\n========================================\n";
+    cout << "             USER ADDED :)              \n";
+    cout << "========================================\n";
+
+    cout << "User \"" << users[position].name
+         << "\" has been registered successfully!\n";
 }
 
 int main()
@@ -584,13 +564,14 @@ int main()
     cout << "========================================\n\n";
 
     const int MAX_BOOKS = 100;
+    const int MAX_USERS = 100;
 
     Book books[MAX_BOOKS];
+    User users[MAX_USERS];
 
     int bookCount = 0;
+    int userCount = 0;
     int choice;
-
-    loadBooks(books, bookCount);
 
     do
     {
@@ -604,13 +585,14 @@ int main()
         cout << "4. Issue Book\n";
         cout << "5. Return Book\n";
         cout << "6. Delete Book\n";
-        cout << "7. Exit\n";
+        cout << "7. Add User\n";
+        cout << "8. Exit\n";
 
         cout << "\nEnter your choice: ";
 
         if (!(cin >> choice))
         {
-            cout << "\nInvalid choice. Please enter a number between 1 and 7. :(\n";
+            cout << "\nInvalid choice. Please enter a number between 1 and 8. :(\n";
             clearInput();
             continue;
         }
@@ -648,6 +630,11 @@ int main()
             break;
 
         case 7:
+            addUser(users, userCount);
+            pauseProgram();
+            break;
+
+        case 8:
             cout << "\n========================================\n";
             cout << "                 EXIT                   \n";
             cout << "========================================\n\n";
@@ -656,11 +643,11 @@ int main()
             break;
 
         default:
-            cout << "\nInvalid choice. Please enter a number between 1 and 7. :(\n";
+            cout << "\nInvalid choice. Please enter a number between 1 and 8. :(\n";
             pauseProgram();
         }
 
-    } while (choice != 7);
+    } while (choice != 8);
 
     cout << "\n========================================\n";
     cout << "  Thank you for using the Library LMS! \n";
